@@ -1,158 +1,128 @@
+-- Create a library object for the UI
 local WacksHub = {}
+WacksHub.__index = WacksHub
 
+-- Function to create a new window
 function WacksHub:Window(title)
-    local window = Instance.new("ScreenGui")
-    window.Name = title
-    window.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    local window = {}
+    setmetatable(window, self)
 
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 400, 0, 300)
-    frame.Position = UDim2.new(0.5, -200, 0.5, -150)
-    frame.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-    frame.Parent = window
+    window.Frame = Instance.new("Frame")
+    window.Frame.Size = UDim2.new(0, 400, 0, 300)
+    window.Frame.Position = UDim2.new(0.5, -200, 0.5, -150)
+    window.Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    window.Frame.AnchorPoint = Vector2.new(0.5, 0.5)
+    window.Frame.Parent = game.Players.LocalPlayer.PlayerGui
 
-    local titleLabel = Instance.new("TextLabel")
-    titleLabel.Size = UDim2.new(1, 0, 0, 30)
-    titleLabel.Position = UDim2.new(0, 0, 0, 0)
-    titleLabel.Text = title
-    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.Parent = frame
+    -- Title
+    window.Title = Instance.new("TextLabel")
+    window.Title.Size = UDim2.new(1, 0, 0, 50)
+    window.Title.BackgroundTransparency = 1
+    window.Title.Text = title
+    window.Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    window.Title.TextSize = 24
+    window.Title.Parent = window.Frame
 
-    window.frame = frame
-    window.titleLabel = titleLabel
+    -- Components container
+    window.Components = {}
+
+    -- Function to add a button
+    function window:Button(label, callback)
+        local button = Instance.new("TextButton")
+        button.Size = UDim2.new(0, 200, 0, 50)
+        button.Position = UDim2.new(0.5, -100, 0, 50 + (#window.Components * 60))
+        button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        button.Text = label
+        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        button.TextSize = 20
+        button.Parent = window.Frame
+
+        -- Button click event
+        button.MouseButton1Click:Connect(function()
+            callback()
+        end)
+
+        table.insert(window.Components, button)
+    end
+
+    -- Function to add a toggle
+    function window:Toggle(label, defaultState, callback)
+        local toggleFrame = Instance.new("Frame")
+        toggleFrame.Size = UDim2.new(0, 200, 0, 50)
+        toggleFrame.Position = UDim2.new(0.5, -100, 0, 50 + (#window.Components * 60))
+        toggleFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        toggleFrame.Parent = window.Frame
+
+        local toggleLabel = Instance.new("TextLabel")
+        toggleLabel.Size = UDim2.new(0.7, 0, 1, 0)
+        toggleLabel.BackgroundTransparency = 1
+        toggleLabel.Text = label
+        toggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        toggleLabel.TextSize = 20
+        toggleLabel.Parent = toggleFrame
+
+        local toggleButton = Instance.new("TextButton")
+        toggleButton.Size = UDim2.new(0, 30, 0, 30)
+        toggleButton.Position = UDim2.new(0.8, 0, 0.5, -15)
+        toggleButton.BackgroundColor3 = defaultState and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+        toggleButton.Text = ""
+        toggleButton.Parent = toggleFrame
+
+        toggleButton.MouseButton1Click:Connect(function()
+            defaultState = not defaultState
+            toggleButton.BackgroundColor3 = defaultState and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+            callback(defaultState)
+        end)
+
+        table.insert(window.Components, toggleFrame)
+    end
+
+    -- Function to add a slider
+    function window:Slider(label, min, max, default, callback)
+        local sliderFrame = Instance.new("Frame")
+        sliderFrame.Size = UDim2.new(0, 200, 0, 50)
+        sliderFrame.Position = UDim2.new(0.5, -100, 0, 50 + (#window.Components * 60))
+        sliderFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        sliderFrame.Parent = window.Frame
+
+        local sliderLabel = Instance.new("TextLabel")
+        sliderLabel.Size = UDim2.new(0.7, 0, 1, 0)
+        sliderLabel.BackgroundTransparency = 1
+        sliderLabel.Text = label
+        sliderLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        sliderLabel.TextSize = 20
+        sliderLabel.Parent = sliderFrame
+
+        local sliderButton = Instance.new("TextButton")
+        sliderButton.Size = UDim2.new(0, 30, 0, 30)
+        sliderButton.Position = UDim2.new(0.8, 0, 0.5, -15)
+        sliderButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+        sliderButton.Text = ""
+        sliderButton.Parent = sliderFrame
+
+        local minValue = min
+        local maxValue = max
+
+        sliderButton.MouseButton1Down:Connect(function()
+            local mouse = game.Players.LocalPlayer:GetMouse()
+            local startX = sliderButton.Position.X.Offset
+            local startPos = mouse.X
+
+            game:GetService("UserInputService").InputChanged:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseMovement then
+                    local delta = input.Position.X - startPos
+                    local newPos = math.clamp(startX + delta, 0, 200)
+                    sliderButton.Position = UDim2.new(0, newPos, 0.5, -15)
+                    local value = math.floor((newPos / 200) * (maxValue - minValue) + minValue)
+                    callback(value)
+                end
+            end)
+        end)
+
+        table.insert(window.Components, sliderFrame)
+    end
 
     return window
-end
-
-function WacksHub:Button(name, callback)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 200, 0, 40)
-    button.Position = UDim2.new(0.5, -100, 0, 50)
-    button.Text = name
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
-    button.Parent = self.frame
-
-    button.MouseButton1Click:Connect(function()
-        callback()
-    end)
-end
-
-function WacksHub:Toggle(name, defaultState, callback)
-    local toggleFrame = Instance.new("Frame")
-    toggleFrame.Size = UDim2.new(0, 200, 0, 40)
-    toggleFrame.Position = UDim2.new(0.5, -100, 0, 100)
-    toggleFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    toggleFrame.Parent = self.frame
-
-    local toggleLabel = Instance.new("TextLabel")
-    toggleLabel.Size = UDim2.new(0, 150, 0, 40)
-    toggleLabel.Text = name
-    toggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    toggleLabel.BackgroundTransparency = 1
-    toggleLabel.Parent = toggleFrame
-
-    local box = Instance.new("Frame")
-    box.Size = UDim2.new(0, 40, 0, 20)
-    box.Position = UDim2.new(0.85, 0, 0, 10)
-    box.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    box.Parent = toggleFrame
-
-    local indicator = Instance.new("Frame")
-    indicator.Size = UDim2.new(0, 0, 1, 0)  -- Start with no green color
-    indicator.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-    indicator.Parent = box
-
-    box.MouseButton1Click:Connect(function()
-        indicator.Size = UDim2.new(0, 40, 1, 0)  -- Expand to show green
-        callback(true)  -- Call the callback with "true"
-    end)
-
-    if defaultState then
-        indicator.Size = UDim2.new(0, 40, 1, 0)  -- Show green at the start
-    end
-end
-
-function WacksHub:Slider(name, min, max, default, callback)
-    local sliderFrame = Instance.new("Frame")
-    sliderFrame.Size = UDim2.new(0, 200, 0, 40)
-    sliderFrame.Position = UDim2.new(0.5, -100, 0, 150)
-    sliderFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    sliderFrame.Parent = self.frame
-
-    local sliderLabel = Instance.new("TextLabel")
-    sliderLabel.Size = UDim2.new(0, 150, 0, 40)
-    sliderLabel.Text = name
-    sliderLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    sliderLabel.BackgroundTransparency = 1
-    sliderLabel.Parent = sliderFrame
-
-    local slider = Instance.new("TextButton")
-    slider.Size = UDim2.new(0, 100, 0, 10)
-    slider.Position = UDim2.new(0.5, -50, 0, 30)
-    slider.Text = ""
-    slider.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-    slider.Parent = sliderFrame
-
-    local handle = Instance.new("Frame")
-    handle.Size = UDim2.new(0, 10, 0, 20)
-    handle.Position = UDim2.new(0, (default - min) / (max - min) * 100, 0, -5)
-    handle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-    handle.Parent = slider
-
-    slider.MouseButton1Drag:Connect(function(input)
-        local position = input.Position.X - slider.Position.X.Offset
-        local value = math.clamp((position / slider.AbsoluteSize.X) * (max - min) + min, min, max)
-        handle.Position = UDim2.new(0, position - 5, 0, -5)
-        callback(value)
-    end)
-end
-
-function WacksHub:Label(text, color)
-    local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(0, 200, 0, 40)
-    label.Position = UDim2.new(0.5, -100, 0, 200)
-    label.Text = text
-    label.TextColor3 = color
-    label.BackgroundTransparency = 1
-    label.Parent = self.frame
-end
-
-function WacksHub:Box(name, callback)
-    local boxFrame = Instance.new("Frame")
-    boxFrame.Size = UDim2.new(0, 200, 0, 40)
-    boxFrame.Position = UDim2.new(0.5, -100, 0, 250)
-    boxFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    boxFrame.Parent = self.frame
-
-    local boxLabel = Instance.new("TextLabel")
-    boxLabel.Size = UDim2.new(0, 150, 0, 40)
-    boxLabel.Text = name
-    boxLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    boxLabel.BackgroundTransparency = 1
-    boxLabel.Parent = boxFrame
-
-    local box = Instance.new("TextBox")
-    box.Size = UDim2.new(0, 100, 0, 40)
-    box.Position = UDim2.new(0.5, -50, 0, 0)
-    box.Text = ""
-    box.TextColor3 = Color3.fromRGB(255, 255, 255)
-    box.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    box.Parent = boxFrame
-
-    box.FocusLost:Connect(function(focusLost)
-        callback(box.Text, focusLost)
-    end)
-end
-
-function WacksHub:Keybind(key)
-    -- For simplicity, just print when the key is pressed
-    game:GetService("UserInputService").InputBegan:Connect(function(input)
-        if input.KeyCode == Enum.KeyCode[key] then
-            print(key .. " key pressed!")
-        end
-    end)
 end
 
 return WacksHub

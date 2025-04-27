@@ -1,0 +1,209 @@
+-- Wacks Hub UI Library
+local WacksHub = {}
+
+function WacksHub:Window(title)
+    local ScreenGui = Instance.new("ScreenGui")
+    local MainFrame = Instance.new("Frame")
+    local Title = Instance.new("TextLabel")
+    local UIListLayout = Instance.new("UIListLayout")
+    local UIPadding = Instance.new("UIPadding")
+
+    ScreenGui.Name = "WacksHubUI"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+    MainFrame.Name = "MainFrame"
+    MainFrame.Parent = ScreenGui
+    MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    MainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    MainFrame.Position = UDim2.new(0.5, -150, 0.5, -150)
+    MainFrame.Size = UDim2.new(0, 300, 0, 30)
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+
+    Title.Name = "Title"
+    Title.Parent = MainFrame
+    Title.BackgroundTransparency = 1
+    Title.Size = UDim2.new(1, 0, 0, 30)
+    Title.Font = Enum.Font.SourceSansBold
+    Title.Text = title or "Wacks Hub"
+    Title.TextColor3 = Color3.fromRGB(200, 200, 200)
+    Title.TextSize = 24
+
+    UIListLayout.Parent = MainFrame
+    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    UIListLayout.Padding = UDim.new(0, 5)
+
+    UIPadding.Parent = MainFrame
+    UIPadding.PaddingTop = UDim.new(0, 35)
+    UIPadding.PaddingLeft = UDim.new(0, 5)
+    UIPadding.PaddingRight = UDim.new(0, 5)
+    UIPadding.PaddingBottom = UDim.new(0, 5)
+
+    local windowFunctions = {}
+
+    function windowFunctions:Button(name, callback)
+        local Button = Instance.new("TextButton")
+        Button.Parent = MainFrame
+        Button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+        Button.BorderColor3 = Color3.fromRGB(255, 255, 255)
+        Button.Size = UDim2.new(1, 0, 0, 30)
+        Button.Font = Enum.Font.SourceSans
+        Button.Text = name
+        Button.TextColor3 = Color3.fromRGB(220, 220, 220)
+        Button.TextSize = 20
+
+        Button.MouseButton1Click:Connect(function()
+            callback()
+        end)
+
+        MainFrame.Size = MainFrame.Size + UDim2.new(0, 0, 0, 35)
+    end
+
+    function windowFunctions:Toggle(name, default, callback)
+        local ToggleFrame = Instance.new("Frame")
+        local ToggleButton = Instance.new("TextButton")
+        local Box = Instance.new("Frame")
+
+        ToggleFrame.Parent = MainFrame
+        ToggleFrame.BackgroundTransparency = 1
+        ToggleFrame.Size = UDim2.new(1, 0, 0, 30)
+
+        ToggleButton.Parent = ToggleFrame
+        ToggleButton.BackgroundTransparency = 1
+        ToggleButton.Size = UDim2.new(0.8, 0, 1, 0)
+        ToggleButton.Position = UDim2.new(0, 0, 0, 0)
+        ToggleButton.Font = Enum.Font.SourceSans
+        ToggleButton.Text = name
+        ToggleButton.TextColor3 = Color3.fromRGB(220, 220, 220)
+        ToggleButton.TextSize = 20
+
+        Box.Parent = ToggleFrame
+        Box.BackgroundColor3 = default and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+        Box.BorderColor3 = Color3.fromRGB(255, 255, 255)
+        Box.Size = UDim2.new(0, 30, 0, 30)
+        Box.Position = UDim2.new(1, -35, 0, 0)
+
+        local toggled = default
+        callback(toggled)
+
+        ToggleButton.MouseButton1Click:Connect(function()
+            toggled = not toggled
+            Box.BackgroundColor3 = toggled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+            callback(toggled)
+        end)
+
+        MainFrame.Size = MainFrame.Size + UDim2.new(0, 0, 0, 35)
+    end
+
+    function windowFunctions:Slider(name, min, max, default, callback)
+        local SliderFrame = Instance.new("Frame")
+        local SliderLabel = Instance.new("TextLabel")
+        local SliderBar = Instance.new("Frame")
+        local SliderButton = Instance.new("TextButton")
+
+        SliderFrame.Parent = MainFrame
+        SliderFrame.BackgroundTransparency = 1
+        SliderFrame.Size = UDim2.new(1, 0, 0, 50)
+
+        SliderLabel.Parent = SliderFrame
+        SliderLabel.BackgroundTransparency = 1
+        SliderLabel.Size = UDim2.new(1, 0, 0, 20)
+        SliderLabel.Font = Enum.Font.SourceSans
+        SliderLabel.Text = name
+        SliderLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+        SliderLabel.TextSize = 20
+
+        SliderBar.Parent = SliderFrame
+        SliderBar.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+        SliderBar.BorderColor3 = Color3.fromRGB(255, 255, 255)
+        SliderBar.Position = UDim2.new(0, 0, 0, 25)
+        SliderBar.Size = UDim2.new(1, 0, 0, 10)
+
+        SliderButton.Parent = SliderBar
+        SliderButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        SliderButton.Size = UDim2.new(0, 10, 1, 0)
+        SliderButton.Position = UDim2.new((default - min) / (max - min), 0, 0, 0)
+        SliderButton.Text = ""
+        SliderButton.AutoButtonColor = false
+
+        local dragging = false
+
+        SliderButton.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = true
+            end
+        end)
+
+        SliderButton.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = false
+            end
+        end)
+
+        game:GetService("UserInputService").InputChanged:Connect(function(input)
+            if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                local relative = input.Position.X - SliderBar.AbsolutePosition.X
+                local percent = math.clamp(relative / SliderBar.AbsoluteSize.X, 0, 1)
+                SliderButton.Position = UDim2.new(percent, 0, 0, 0)
+                local value = math.floor((max - min) * percent + min)
+                callback(value)
+            end
+        end)
+
+        MainFrame.Size = MainFrame.Size + UDim2.new(0, 0, 0, 55)
+    end
+
+    function windowFunctions:Box(name, callback)
+        local BoxFrame = Instance.new("Frame")
+        local BoxLabel = Instance.new("TextLabel")
+        local TextBox = Instance.new("TextBox")
+
+        BoxFrame.Parent = MainFrame
+        BoxFrame.BackgroundTransparency = 1
+        BoxFrame.Size = UDim2.new(1, 0, 0, 40)
+
+        BoxLabel.Parent = BoxFrame
+        BoxLabel.BackgroundTransparency = 1
+        BoxLabel.Size = UDim2.new(0.5, 0, 1, 0)
+        BoxLabel.Font = Enum.Font.SourceSans
+        BoxLabel.Text = name
+        BoxLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+        BoxLabel.TextSize = 20
+
+        TextBox.Parent = BoxFrame
+        TextBox.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+        TextBox.BorderColor3 = Color3.fromRGB(255, 255, 255)
+        TextBox.Size = UDim2.new(0.5, -5, 1, 0)
+        TextBox.Position = UDim2.new(0.5, 5, 0, 0)
+        TextBox.Font = Enum.Font.SourceSans
+        TextBox.Text = ""
+        TextBox.TextColor3 = Color3.fromRGB(220, 220, 220)
+        TextBox.TextSize = 20
+
+        TextBox.FocusLost:Connect(function(enter)
+            if enter then
+                callback(TextBox.Text, true)
+            end
+        end)
+
+        MainFrame.Size = MainFrame.Size + UDim2.new(0, 0, 0, 45)
+    end
+
+    function windowFunctions:Label(text)
+        local Label = Instance.new("TextLabel")
+        Label.Parent = MainFrame
+        Label.BackgroundTransparency = 1
+        Label.Size = UDim2.new(1, 0, 0, 20)
+        Label.Font = Enum.Font.SourceSans
+        Label.Text = text
+        Label.TextColor3 = Color3.fromRGB(150, 150, 150)
+        Label.TextSize = 18
+
+        MainFrame.Size = MainFrame.Size + UDim2.new(0, 0, 0, 25)
+    end
+
+    return windowFunctions
+end
+
+return WacksHub

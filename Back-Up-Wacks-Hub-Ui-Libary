@@ -1,4 +1,5 @@
--- Create a library object for the UI
+-- Library Code for WacksHub UI Library
+
 local WacksHub = {}
 WacksHub.__index = WacksHub
 
@@ -7,20 +8,23 @@ function WacksHub:Window(title)
     local window = {}
     setmetatable(window, self)
 
+    -- Window Frame
     window.Frame = Instance.new("Frame")
     window.Frame.Size = UDim2.new(0, 400, 0, 300)
     window.Frame.Position = UDim2.new(0.5, -200, 0.5, -150)
-    window.Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    window.Frame.BackgroundColor3 = Color3.fromRGB(33, 33, 33) -- Custom Dark Color
     window.Frame.AnchorPoint = Vector2.new(0.5, 0.5)
     window.Frame.Parent = game.Players.LocalPlayer.PlayerGui
 
-    -- Title
+    -- Title Label
     window.Title = Instance.new("TextLabel")
     window.Title.Size = UDim2.new(1, 0, 0, 50)
     window.Title.BackgroundTransparency = 1
     window.Title.Text = title
-    window.Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    window.Title.TextColor3 = Color3.fromRGB(255, 255, 255) -- White
     window.Title.TextSize = 24
+    window.Title.TextStrokeTransparency = 0.8
+    window.Title.TextStrokeColor3 = Color3.fromRGB(0, 0, 0) -- Black outline
     window.Title.Parent = window.Frame
 
     -- Components container
@@ -31,10 +35,12 @@ function WacksHub:Window(title)
         local button = Instance.new("TextButton")
         button.Size = UDim2.new(0, 200, 0, 50)
         button.Position = UDim2.new(0.5, -100, 0, 50 + (#window.Components * 60))
-        button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        button.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Custom Button Color
         button.Text = label
-        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        button.TextColor3 = Color3.fromRGB(255, 255, 255) -- White Text
         button.TextSize = 20
+        button.TextStrokeTransparency = 0.8
+        button.TextStrokeColor3 = Color3.fromRGB(0, 0, 0) -- Black outline
         button.Parent = window.Frame
 
         -- Button click event
@@ -50,15 +56,17 @@ function WacksHub:Window(title)
         local toggleFrame = Instance.new("Frame")
         toggleFrame.Size = UDim2.new(0, 200, 0, 50)
         toggleFrame.Position = UDim2.new(0.5, -100, 0, 50 + (#window.Components * 60))
-        toggleFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        toggleFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Custom Background Color
         toggleFrame.Parent = window.Frame
 
         local toggleLabel = Instance.new("TextLabel")
         toggleLabel.Size = UDim2.new(0.7, 0, 1, 0)
         toggleLabel.BackgroundTransparency = 1
         toggleLabel.Text = label
-        toggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        toggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- White Text
         toggleLabel.TextSize = 20
+        toggleLabel.TextStrokeTransparency = 0.8
+        toggleLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0) -- Black outline
         toggleLabel.Parent = toggleFrame
 
         local toggleButton = Instance.new("TextButton")
@@ -82,21 +90,23 @@ function WacksHub:Window(title)
         local sliderFrame = Instance.new("Frame")
         sliderFrame.Size = UDim2.new(0, 200, 0, 50)
         sliderFrame.Position = UDim2.new(0.5, -100, 0, 50 + (#window.Components * 60))
-        sliderFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        sliderFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Custom Background Color
         sliderFrame.Parent = window.Frame
 
         local sliderLabel = Instance.new("TextLabel")
         sliderLabel.Size = UDim2.new(0.7, 0, 1, 0)
         sliderLabel.BackgroundTransparency = 1
         sliderLabel.Text = label
-        sliderLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        sliderLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- White Text
         sliderLabel.TextSize = 20
+        sliderLabel.TextStrokeTransparency = 0.8
+        sliderLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0) -- Black outline
         sliderLabel.Parent = sliderFrame
 
         local sliderButton = Instance.new("TextButton")
         sliderButton.Size = UDim2.new(0, 30, 0, 30)
         sliderButton.Position = UDim2.new(0.8, 0, 0.5, -15)
-        sliderButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+        sliderButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- Slider Button Color
         sliderButton.Text = ""
         sliderButton.Parent = sliderFrame
 
